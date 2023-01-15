@@ -25,6 +25,13 @@
 // =================================================================================================
 
 typedef struct {
+    uint16_t type;
+    uint16_t flags; // may avoid loading if bit zero is set
+    uint32_t size;
+    uint8_t data[];
+} __attribute__ ((__packed__)) multiboot2_tag;
+
+typedef struct {
     uint32_t magic; // 0xE85250D6
     uint32_t architecture; // 0 = x86, 4 = 32-bit mips
     uint32_t header_length; 
@@ -34,13 +41,6 @@ typedef struct {
 #define MULTIBOOT2_EAX_MAGIC 0x2BADB002
 #define MULTIBOOT2_ARCHITECTURE_X86 0
 #define MULTIBOOT2_ARCHITECTURE_MIPS32 4
-
-typedef struct {
-    uint16_t type;
-    uint16_t flags; // may avoid loading if bit zero is set
-    uint32_t size;
-    uint8_t data[];
-} __attribute__ ((__packed__)) multiboot2_tag;
 
 typedef struct {
     uint16_t type; // 1
@@ -135,17 +135,17 @@ typedef struct {
 // =================================================================================================
 
 typedef struct {
+    uint32_t type;
+    uint32_t size;
+    uint8_t data[];
+} __attribute__ ((__packed__)) multiboot2_info_tag;
+
+typedef struct {
     uint32_t size;
     uint32_t reserved;
     multiboot2_info_tag tags[]; // must end with a tag of type 0 and size 8
 } __attribute__ ((__packed__)) multiboot2_info_table;
 #define MULTIBOOT2_INFO_END {0, 8}
-
-typedef struct {
-    uint32_t type;
-    uint32_t size;
-    uint8_t data[];
-} __attribute__ ((__packed__)) multiboot2_info_tag;
 
 typedef struct {
     uint32_t type; // 1
@@ -189,11 +189,18 @@ typedef struct {
 #define MULTIBOOT2_INFO_BOOTDEV 5
 
 typedef struct {
+    uint64_t base_addr;
+    uint64_t length;
+    uint32_t type;
+    uint32_t reserved;
+} __attribute__ ((__packed__)) multiboot2_mmap_entry;
+
+typedef struct {
     uint32_t type; // 6
     uint32_t size; 
     uint32_t entry_size;            // size of one entry
     uint32_t entry_version;         // 0
-    multiboot2_mmap_entry memory[]; // array of memory regions, refer to MULTIBOOT2 MEMORY STRUCTURE below
+    multiboot2_mmap_entry memory[]; // array of memory regions
 } __attribute__ ((__packed__)) multiboot2_info_memmap_tap;
 #define MULTIBOOT2_INFO_MEMMAP 6
 
@@ -210,6 +217,26 @@ typedef struct { // bios thing, dont care for now
 #define MULTIBOOT2_INFO_VBE 7
 
 typedef struct {
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+} __attribute__ ((__packed__)) framebuffer_palette;
+
+typedef struct {
+    uint32_t num_colors;
+    framebuffer_palette palettes[];
+} __attribute__ ((__packed__)) framebuffer_type_0;
+
+typedef struct {
+    uint8_t red_field_position;
+    uint8_t red_mask_size;
+    uint8_t green_field_position;
+    uint8_t green_mask_size;
+    uint8_t blue_field_position;
+    uint8_t blue_mask_size;
+} __attribute__ ((__packed__)) framebuffer_type_1;
+
+typedef struct {
     uint32_t type; // 8
     uint32_t size; 
     uint64_t addr;   // physical address of the framebuffer 
@@ -217,9 +244,9 @@ typedef struct {
     uint32_t width;  // number of pixels per line
     uint32_t height; // number of lines
     uint8_t bpp;     // bits per pixel
-    uint8_t type;    // 0 = indexed, 1 = rgb, 2 = ega text
+    uint8_t fb_type; // 0 = indexed, 1 = rgb, 2 = ega text
     uint8_t reserved; 
-    uint8_t color_info[]; // nothing for 2, refer to MULTIBOOT2 FRAMEBUFFER TAG below for others
+    uint8_t color_info[]; // nothing for type 2, refer to above for others
 } __attribute__ ((__packed__)) multiboot2_info_framebuffer_tag;
 #define MULTIBOOT2_INFO_FRAMEBUFFER 8
 
@@ -273,17 +300,39 @@ typedef struct { // bios thing, dont care for now
 } __attribute__ ((__packed__)) multiboot2_info_smbios_tag;
 #define MULTIBOOT2_INFO_SMBIOS 13
 
+typedef struct {
+    char signature[8];
+    uint8_t checksum;
+    char oem_id[6];
+    uint8_t revision;
+    uint32_t rsdt_addr;
+} __attribute__ ((__packed__)) rsdp_v1_desc;
+#define RSDP_V1_SIGNATURE "RSD PTR "
+
 typedef struct { // old acpi, dont care for now
     uint32_t type; // 14
     uint32_t size; 
-    rsdp_v1_desc table; // refer to RSDP TABLES below
+    rsdp_v1_desc table; // refer to above
 } __attribute__ ((__packed__)) multiboot2_info_acpi1_tag;
 #define MULTIBOOT2_INFO_ACPI1 14
+
+typedef struct {
+    char signature[8];
+    uint8_t checksum;
+    char oem_id[6];
+    uint8_t revision;
+    uint32_t rsdt_addr;
+    uint32_t length;
+    uint64_t xsdt_addr;
+    uint8_t extended_checksum;
+    uint8_t reserved[3];
+} __attribute__ ((__packed__)) rsdp_v2_desc;
+#define RSDP_V2_SIGNATURE "RSD PTR "
 
 typedef struct { 
     uint32_t type; // 15
     uint32_t size; 
-    rsdp_v2_desc table; // refer to RSDP TABLES below
+    rsdp_v2_desc table; // refer to above
 } __attribute__ ((__packed__)) multiboot2_info_acpi2_tag;
 #define MULTIBOOT2_INFO_ACPI2 15
 
@@ -329,70 +378,5 @@ typedef struct {
     uint32_t load_base_addr; // used if image has relocatable header 
 } __attribute__ ((__packed__)) multiboot2_info_image_base_tag;
 #define MULTIBOOT2_INFO_IMAGE_BASE 21
-
-// =================================================================================================
-// MULTIBOOT2 ELF SECTIONS TAG
-// =================================================================================================
-
-// TODO: elf sections tag
-
-// =================================================================================================
-// MULTIBOOT2 MEMORY STRUCTURE
-// =================================================================================================
-
-typedef struct {
-    uint64_t base_addr;
-    uint64_t length;
-    uint32_t type;
-    uint32_t reserved;
-} __attribute__ ((__packed__)) multiboot2_mmap_entry;
-
-// =================================================================================================
-// MULTIBOOT2 FRAMEBUFFER TAG
-// =================================================================================================
-
-typedef struct {
-    uint32_t num_colors;
-    framebuffer_palette palettes[];
-} __attribute__ ((__packed__)) framebuffer_type_0;
-
-typedef struct {
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-} __attribute__ ((__packed__)) framebuffer_palette;
-
-typedef struct {
-    uint8_t red_field_position;
-    uint8_t red_mask_size;
-    uint8_t green_field_position;
-    uint8_t green_mask_size;
-    uint8_t blue_field_position;
-    uint8_t blue_mask_size;
-} __attribute__ ((__packed__)) framebuffer_type_1;
-
-// =================================================================================================
-// RSDP TABLES
-// =================================================================================================
-
-typedef struct {
-    char signature[8];
-    uint8_t checksum;
-    char oem_id[6];
-    uint8_t revision;
-    uint32_t rsdt_addr;
-} __attribute__ ((__packed__)) rsdp_v1_desc;
-
-typedef struct {
-    char signature[8];
-    uint8_t checksum;
-    char oem_id[6];
-    uint8_t revision;
-    uint32_t rsdt_addr;
-    uint32_t length;
-    uint64_t xsdt_addr;
-    uint8_t extended_checksum;
-    uint8_t reserved[3];
-} __attribute__ ((__packed__)) rsdp_v2_desc;
 
 #endif
