@@ -25,7 +25,7 @@ typedef struct {
     uint16  Data2;
     uint16  Data3;
     byte    Data4[8]; 
-} EFI_GUID;
+}  EFI_GUID;
 
 typedef struct {          
     uint16      Year;       // 1998 - 20XX

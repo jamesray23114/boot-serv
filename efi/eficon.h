@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "efidef.h"
+#include <efidef.h>
 #include <typedef.h>
 
 struct _SIMPLE_TEXT_OUTPUT_INTERFACE;

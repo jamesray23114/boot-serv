@@ -12,8 +12,9 @@
 
 #pragma once
 
-#include "efiapi.h"
-#include "efiprot.h"
+#include <efiapi.h>
+#include <efiprot.h>
+#include <efistatus.h>
 
 extern EFI_SYSTEM_TABLE*   ST;
 extern EFI_BOOT_SERVICES*  BS;

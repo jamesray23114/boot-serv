@@ -408,16 +408,6 @@ typedef struct {
     uint16                  FileName[1];
 } EFI_FILE_INFO;
 
-//
-// The FileName field of the EFI_FILE_INFO data structure is variable length.
-// Whenever code needs to know the size of the EFI_FILE_INFO data structure, it needs to
-// be the size of the data structure without the FileName field.  The following macro
-// computes this size correctly no matter how big the FileName array is declared.
-// This is required to make the EFI_FILE_INFO data structure ANSI compilant.
-//
-
-#define SIZE_OF_EFI_FILE_INFO EFI_FIELD_OFFSET(EFI_FILE_INFO,FileName)
-
 #define EFI_FILE_SYSTEM_INFO_ID    \
     { 0x9576e93, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b} }
 
@@ -429,16 +419,6 @@ typedef struct {
     uint32                  BlockSize;
     uint16                  VolumeLabel[1];
 } EFI_FILE_SYSTEM_INFO;
-
-//
-// The VolumeLabel field of the EFI_FILE_SYSTEM_INFO data structure is variable length.
-// Whenever code needs to know the size of the EFI_FILE_SYSTEM_INFO data structure, it needs
-// to be the size of the data structure without the VolumeLable field.  The following macro
-// computes this size correctly no matter how big the VolumeLable array is declared.
-// This is required to make the EFI_FILE_SYSTEM_INFO data structure ANSI compilant.
-//
-
-#define SIZE_OF_EFI_FILE_SYSTEM_INFO EFI_FIELD_OFFSET(EFI_FILE_SYSTEM_INFO,VolumeLabel)
 
 #define EFI_FILE_SYSTEM_VOLUME_LABEL_ID    \
     { 0xDB47D7D3,0xFE81, 0x11d3, {0x9A, 0x35, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D} }

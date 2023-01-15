@@ -44,8 +44,8 @@ typedef struct {
 
 typedef struct {
     uint16_t type; // 1
-    uint16_t flags; 
-    uint32_t size;
+    uint16_t flags;  
+    uint32_t size; 
     uint32_t tags[]; // info tags requested by the kernel, the value refering to the type of the tag
 } __attribute__ ((__packed__)) multiboot2_request_tag; // refer to MULTIBOOT2 INFO STRUCTURE below
 #define MULTIBOOT2_TAG_REQUEST 1

@@ -12,10 +12,9 @@
 
 #pragma once
 
-#include "typedef.h"
-
-#include "efidef.h"
-#include "eficon.h"
+#include <efidef.h>
+#include <eficon.h>
+#include <typedef.h>
 
 struct _EFI_SYSTEM_TABLE;
 
