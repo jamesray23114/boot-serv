@@ -1,3 +1,15 @@
+/*********************************************************************
+ * this file (eficon.h) is code adapted from the uefi specification, licensed under the BSD 2-Clause License
+ * original source code available at https://uefi.org/sites/default/files/resources/UEFI_Spec_2_10_Aug29.pdf
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON 
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**********************************************************************/
+
 #pragma once
 
 #include "efidef.h"
@@ -6,49 +18,49 @@
 struct _SIMPLE_TEXT_OUTPUT_INTERFACE;
 struct _SIMPLE_INPUT_INTERFACE;
 
-typedef uintn (*EFI_TEXT_RESET) (
+typedef EFI_STATUS (*EFI_TEXT_RESET) (
     struct _SIMPLE_TEXT_OUTPUT_INTERFACE     *This,
     bool                      ExtendedVerification
     );
 
-typedef uintn (*EFI_TEXT_OUTPUT_STRING) (
+typedef EFI_STATUS (*EFI_TEXT_OUTPUT_STRING) (
    struct _SIMPLE_TEXT_OUTPUT_INTERFACE     *This,
    uint16                       *String
     );
 
-typedef uintn (*EFI_TEXT_TEST_STRING) (
+typedef EFI_STATUS (*EFI_TEXT_TEST_STRING) (
    struct _SIMPLE_TEXT_OUTPUT_INTERFACE     *This,
    uint16                       *String
     );
 
-typedef uintn (*EFI_TEXT_QUERY_MODE) (
+typedef EFI_STATUS (*EFI_TEXT_QUERY_MODE) (
    struct _SIMPLE_TEXT_OUTPUT_INTERFACE     *This,
    uintn                        ModeNumber,
    uintn                       *Columns,
    uintn                       *Rows
     );
 
-typedef uintn (*EFI_TEXT_SET_MODE) (
+typedef EFI_STATUS (*EFI_TEXT_SET_MODE) (
    struct _SIMPLE_TEXT_OUTPUT_INTERFACE     *This,
    uintn                        ModeNumber
     );
 
-typedef uintn (*EFI_TEXT_SET_ATTRIBUTE) (
+typedef EFI_STATUS (*EFI_TEXT_SET_ATTRIBUTE) (
    struct _SIMPLE_TEXT_OUTPUT_INTERFACE     *This,
    uintn                        Attribute
     );
 
-typedef uintn (*EFI_TEXT_CLEAR_SCREEN) (
+typedef EFI_STATUS (*EFI_TEXT_CLEAR_SCREEN) (
    struct _SIMPLE_TEXT_OUTPUT_INTERFACE     *This
     );
 
-typedef uintn (*EFI_TEXT_SET_CURSOR_POSITION) (
+typedef EFI_STATUS (*EFI_TEXT_SET_CURSOR_POSITION) (
    struct _SIMPLE_TEXT_OUTPUT_INTERFACE     *This,
    uintn                        Column,
    uintn                        Row
     );
 
-typedef uintn (*EFI_TEXT_ENABLE_CURSOR) (
+typedef EFI_STATUS (*EFI_TEXT_ENABLE_CURSOR) (
    struct _SIMPLE_TEXT_OUTPUT_INTERFACE     *This,
    bool                      Enable
     );
@@ -96,12 +108,12 @@ typedef struct {
     uint16                              UnicodeChar;
 } EFI_INPUT_KEY;
 
-typedef uintn (*EFI_INPUT_RESET) (
+typedef EFI_STATUS (*EFI_INPUT_RESET) (
    struct _SIMPLE_INPUT_INTERFACE   *This,
    bool                          ExtendedVerification
     );
 
-typedef uintn (*EFI_INPUT_READ_KEY) (
+typedef EFI_STATUS (*EFI_INPUT_READ_KEY) (
    struct _SIMPLE_INPUT_INTERFACE   *This,
    EFI_INPUT_KEY                   *Key
     );

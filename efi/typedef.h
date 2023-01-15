@@ -1,3 +1,10 @@
+/*********************************************************************
+ * this file (typedef.h) is part of the boot-serv project, licensed under the GNU GPLv3
+ * source code available at https://github.com/jamesray23114/boot-serv 
+ * 
+ * refer to the LICENSE file for more information
+**********************************************************************/
+
 #pragma once
 
 #include "stdint.h"
