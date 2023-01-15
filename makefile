@@ -1,7 +1,17 @@
 .SILENT:
 
-CFLAGS := -ffreestanding -fno-stack-protector -fshort-wchar -mno-red-zone -mno-ms-bitfields -I src -I efi -Ofast 
+CFLAGS := -ffreestanding -fno-stack-protector -fshort-wchar -mno-red-zone -mno-ms-bitfields -I src -I efi -I api -Ofast 
 LFLAGS := -nostdlib -Wl,-dll -shared -Wl,--subsystem,10 -e efi_main -Ofast 
+
+.PHONY: test
+test:
+	gcc -fshort-wchar -c tools/maketxt.c -o txt.o
+	gcc -o maketxt txt.o
+
+	./maketxt
+
+	rm ./maketxt
+	rm ./txt.o
 
 .PHONY: build
 build:
@@ -12,7 +22,7 @@ build:
 
 	truncate -s 32M _build/fat.img
 	truncate -s 1244M _build/test.img
-	
+
 	mkfs.fat -v -F 32 -S 512 -s 1 -n "FAT32" _build/fat.img 65535 1>/dev/null 2>/dev/null
 	mmd -i _build/fat.img ::/EFI
 	mmd -i _build/fat.img ::/EFI/BOOT
@@ -21,6 +31,7 @@ build:
 	x86_64-w64-mingw32-gcc $(LFLAGS) -o _build/BOOTX64.EFI _build/boot-main.o 
 
 	mcopy -i _build/fat.img _build/BOOTX64.EFI ::/EFI/BOOT
+	mcopy -i _build/fat.img _build/test.txt ::/EFI/BOOT
 
 	dd if=_build/fat.img of=_build/test.img bs=512 count=65535 conv=notrunc status=none 
 
