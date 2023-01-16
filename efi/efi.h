@@ -16,8 +16,8 @@
 #include <efiprot.h>
 #include <efistatus.h>
 
-extern EFI_SYSTEM_TABLE*   ST;
-extern EFI_BOOT_SERVICES*  BS;
+//extern EFI_SYSTEM_TABLE*   ST;
+//extern EFI_BOOT_SERVICES*  BS;
 
 static inline bool guid_equal(EFI_GUID a, EFI_GUID b)
 {
