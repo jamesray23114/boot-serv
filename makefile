@@ -52,5 +52,5 @@ run: build
 		-device ide-hd,drive=drive0,bus=ide.0,unit=0,bootindex=0 \
 		-usb \
 		-vga std \
-		-serial vc 
+		-serial file:_temp/serial.log  
 

@@ -23,10 +23,12 @@ void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SY
     uintn desc_size = 0;
     uint32 desc_version = 0;
 
+    // allocate and get memory map
     EFI_STATUS status = ST->BootServices->GetMemoryMap(&size, buffer, &key, &desc_size, &desc_version);
     if (status == EFI_BUFFER_TOO_SMALL) ; 
     else check_status(u"failed to get memory map size, error: ", status, ImageHandle, ST);
-    
+
+    size += sizeof(EFI_MEMORY_DESCRIPTOR) * 4; 
     buffer = (EFI_MEMORY_DESCRIPTOR*) malloc(size, ImageHandle, ST);
     
     status = ST->BootServices->GetMemoryMap(&size, buffer, &key, &desc_size, &desc_version);
@@ -34,31 +36,31 @@ void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SY
 
     uintn num_entries = size / desc_size;
 
-    multiboot2_info_memory_tag* memtag = (multiboot2_info_memory_tag*) table->tags + table->size;
+    // set up multiboot2 info tables
+    multiboot2_info_memory_tag* memtag = (multiboot2_info_memory_tag*) ((byte*) table + table->size);
     table->size += sizeof(multiboot2_info_memory_tag);
     memtag->type = MULTIBOOT2_INFO_MEMORY;
     memtag->size = sizeof(multiboot2_info_memory_tag);
-
-    multiboot2_info_memmap_tag* mmaptag = (multiboot2_info_memmap_tag*) table->tags + table->size;
+    
+    multiboot2_info_memmap_tag* mmaptag = (multiboot2_info_memmap_tag*) ((byte*) table + table->size);
     mmaptag->type = MULTIBOOT2_INFO_MEMMAP;
     mmaptag->size = sizeof(multiboot2_info_memmap_tag);
     mmaptag->entry_size = sizeof(multiboot2_mmap_entry);
     mmaptag->entry_version = 0;
 
     multiboot2_mmap_entry* entry = nullptr;
-
     bool found_lower = false;
-    bool found_upper = false;
+    bool found_upper = false; // todo: this doesnt get the right value
 
     int j = 0;
     for(int i = 0; i < num_entries; i++)
     {
-        EFI_MEMORY_DESCRIPTOR* curr = (EFI_MEMORY_DESCRIPTOR*)((uintn) buffer + (i * desc_size));
+        // cannot index into buffer directly, must use this method
+        EFI_MEMORY_DESCRIPTOR* curr = (EFI_MEMORY_DESCRIPTOR*)((uintn) buffer + (i * desc_size)); 
         switch(curr->Type)
         {
-            
             case EfiReservedMemoryType:
-                break;
+            break;
 
             // usable memory
             case EfiLoaderCode:
@@ -68,11 +70,13 @@ void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SY
             case EfiConventionalMemory:
             case EfiPersistentMemory:
             case EfiACPIReclaimMemory:
+
                 if (!found_lower) {
                     memtag->mem_lower = curr->PhysicalStart / 1024;
                     found_lower = true;
                 }
 
+                // check if the previous entry is the same type and if so, add the length to it
                 if (j == 0) { // TODO: move this to a function
                     mmaptag->entries[j].base_addr = curr->PhysicalStart;
                     mmaptag->entries[j].length = curr->NumberOfPages * 4096;
@@ -177,25 +181,28 @@ void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SY
     }
 
     memtag->mem_upper -= 1024*1024; // standard says to subtract 1MB
-
-    // for (int i = 0; i < mmaptag->size / sizeof(multiboot2_mmap_entry); i++) {
-    //     print(u"memory type: ");
-    //     puti(mmaptag->entries[i].type);
-    //     print(u" addr: ");
-    //     puti(mmaptag->entries[i].base_addr);
-    //     print(u" -> ");
-    //     puti(mmaptag->entries[i].base_addr + mmaptag->entries[i].length);
-    //     endl();
-    // }
-
     table->size += mmaptag->size;
 
-    multiboot2_info_efi_memmap_tag *efimmaptag = (multiboot2_info_efi_memmap_tag *) ((uint8_t *) mmaptag + mmaptag->size);
+
+    //for (int i = 0; i < mmaptag->size / sizeof(multiboot2_mmap_entry); i++) {
+    //    print(u"memory type: ");
+    //    puti(mmaptag->entries[i].type);
+    //    print(u" addr: ");
+    //    puti(mmaptag->entries[i].base_addr);
+    //    print(u" -> ");
+    //    puti(mmaptag->entries[i].base_addr + mmaptag->entries[i].length);
+    //    endl();
+    //}
+
+    multiboot2_info_efi_memmap_tag *efimmaptag = (multiboot2_info_efi_memmap_tag *) ((byte*) table + table->size);
     efimmaptag->type = MULTIBOOT2_INFO_EFI_MEMMAP;
     efimmaptag->size = sizeof(multiboot2_info_efi_memmap_tag) + size;
     efimmaptag->desc_size = desc_size;
     efimmaptag->desc_version = desc_version;
-    memcpy(efimmaptag->data, buffer, size);
 
+
+    memcpy(efimmaptag->data, buffer, size);
     table->size += efimmaptag->size;
+
+    hd(mmaptag, 16 * 128, ImageHandle, ST);
 }

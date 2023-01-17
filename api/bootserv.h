@@ -348,7 +348,7 @@ typedef struct {
     uint32_t size; 
     uint32_t desc_size; // size of one entry
     uint32_t desc_version; // 1
-    uint8_t data[]; // array of entries #TODO: type for entries
+    EFI_MEMORY_DESCRIPTOR data[]; 
 } __attribute__ ((__packed__)) multiboot2_info_efi_memmap_tag;
 #define MULTIBOOT2_INFO_EFI_MEMMAP 17
 
