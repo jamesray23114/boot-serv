@@ -14,7 +14,6 @@
 void efi_main(EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 {
     EFI_SYSTEM_TABLE*  ST = SystemTable;
-    EFI_STATUS         status;
 
     uint16* msg; BS->AllocatePool(EfiLoaderData, 66, (void**) &msg);
 
@@ -24,11 +23,8 @@ void efi_main(EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
     // load disk driver via efi
 
     EFI_FILE_PROTOCOL* fs = find_root(ImageHandle, ST);
-    EFI_FILE_HANDLE file = open_file(fs, L"\\EFI\\BOOT\\test.txt", ImageHandle, ST);
-    byte* data = read_file(file, ImageHandle, ST);
-
-    print((uint16*) data);
-    endl();
+    //EFI_FILE_HANDLE file = open_file(fs, L"\\EFI\\BOOT\\test.txt", ImageHandle, ST);
+    //byte* data = read_file(file, ImageHandle, ST);
 
     print(L"stalling... ");
     while (true) ;

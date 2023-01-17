@@ -26,3 +26,15 @@ uint16* inttostr(uint16* str, uint64 val, uint base) {
 
     return str + i + 1;
 }
+
+uintn wstrlen(uint16* str) {
+    uintn i = 0;
+    while (str[i] != '\0') i++;
+    return i * 2; // 2 bytes per char
+}
+
+uintn strlen(char* str) {
+    uintn i = 0;
+    while (str[i] != '\0') i++;
+    return i;
+}

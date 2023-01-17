@@ -11,7 +11,6 @@
 #include "common.h"
 
 EFI_FILE_PROTOCOL* find_root(EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
-
     EFI_STATUS status;
     EFI_GUID image_guid = EFI_LOADED_IMAGE_PROTOCOL_GUID;
     EFI_GUID disk_guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
@@ -32,8 +31,7 @@ EFI_FILE_PROTOCOL* find_root(EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
     return fs;
 }
 
-EFI_FILE_HANDLE open_file(EFI_FILE_PROTOCOL* fs, uint16* path, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
-
+EFI_FILE_HANDLE open_file(EFI_FILE_PROTOCOL* fs, uint16* path, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) { // file must already exist, this does not create a new file
     EFI_STATUS status;
     EFI_FILE_HANDLE file;
 
@@ -43,8 +41,17 @@ EFI_FILE_HANDLE open_file(EFI_FILE_PROTOCOL* fs, uint16* path, EFI_HANDLE* Image
     return file;
 }
 
-byte* read_file(EFI_FILE_HANDLE file, EFI_HANDLE *ImageHandle, EFI_SYSTEM_TABLE *ST) {
+EFI_FILE_HANDLE create_file(EFI_FILE_PROTOCOL* fs, uint16* path, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) { 
+    EFI_STATUS status;
+    EFI_FILE_HANDLE file;
 
+    status = fs->Open(fs, &file, path, EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE, 0);
+    check_status(L"failed to create file, error: ", status, ImageHandle, ST);
+
+    return file;
+}
+
+byte* read_file(EFI_FILE_HANDLE file, EFI_HANDLE *ImageHandle, EFI_SYSTEM_TABLE *ST) {
     EFI_STATUS status;
     EFI_FILE_INFO* info;
     EFI_GUID info_guid = EFI_FILE_INFO_ID;
@@ -70,4 +77,18 @@ byte* read_file(EFI_FILE_HANDLE file, EFI_HANDLE *ImageHandle, EFI_SYSTEM_TABLE 
     check_status(L"failed to read file, error: ", status, ImageHandle, ST);
 
     return file_buf;
+}
+
+void write_file(EFI_FILE_HANDLE file, byte* data, uintn size, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
+    EFI_STATUS status;
+
+    status = file->Write(file, &size, data);
+    check_status(L"failed to write file, error: ", status, ImageHandle, ST);
+}
+
+void close_file(EFI_FILE_HANDLE file, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
+    EFI_STATUS status;
+
+    status = file->Close(file);
+    check_status(L"failed to close file, error: ", status, ImageHandle, ST);
 }
