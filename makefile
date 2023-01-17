@@ -31,7 +31,6 @@ build:
 	x86_64-w64-mingw32-gcc $(LFLAGS) -o _build/BOOTX64.EFI _build/boot-main.o 
 
 	mcopy -i _build/fat.img _build/BOOTX64.EFI ::/EFI/BOOT
-	mcopy -i _build/fat.img _build/test.txt ::/EFI/BOOT
 
 	dd if=_build/fat.img of=_build/test.img bs=512 count=65535 conv=notrunc status=none 
 

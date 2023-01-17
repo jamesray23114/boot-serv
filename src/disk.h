@@ -9,6 +9,7 @@
 #include <typedef.h>
 
 #include "common.h"
+#include "memory.h"
 
 EFI_FILE_PROTOCOL* find_root(EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
     EFI_STATUS status;
@@ -61,15 +62,12 @@ byte* read_file(EFI_FILE_HANDLE file, EFI_HANDLE *ImageHandle, EFI_SYSTEM_TABLE 
     if(status == EFI_BUFFER_TOO_SMALL) ;
     else check_status(L"failed to get file info, error: ", status, ImageHandle, ST);
 
-    status = BS->AllocatePool(EfiLoaderData, size, (void**) &info);
-    check_status(L"failed to allocate pool, error: ", status, ImageHandle, ST);
+    info = malloc(size, ImageHandle, ST);
 
     status = file->GetInfo(file, &info_guid, &size, (void**) info);
     check_status(L"failed to get file info, error: ", status, ImageHandle, ST);
 
-    byte* file_buf;
-    status = BS->AllocatePool(EfiLoaderData, info->FileSize, (void**) &file_buf);
-    check_status(L"failed to allocate pool, error: ", status, ImageHandle, ST);
+    byte* file_buf = malloc(info->FileSize, ImageHandle, ST);
 
     size = info->FileSize;
 

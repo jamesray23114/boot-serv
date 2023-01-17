@@ -16,6 +16,8 @@
 #define COUT ST->ConOut
 #define BS   ST->BootServices
 
+uint16 msg[67];
+
 #define print(str) COUT->OutputString(COUT, str)
 #define puti(val)  print(inttostr(msg, val, 10))
 #define puth(val)  print(inttostr(msg, val, 16))

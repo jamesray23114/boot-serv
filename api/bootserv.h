@@ -198,10 +198,10 @@ typedef struct {
 typedef struct {
     uint32_t type; // 6
     uint32_t size; 
-    uint32_t entry_size;            // size of one entry
-    uint32_t entry_version;         // 0
-    multiboot2_mmap_entry memory[]; // array of memory regions
-} __attribute__ ((__packed__)) multiboot2_info_memmap_tap;
+    uint32_t entry_size;             // size of one entry
+    uint32_t entry_version;          // 0
+    multiboot2_mmap_entry entries[]; // array of memory regions
+} __attribute__ ((__packed__)) multiboot2_info_memmap_tag;
 #define MULTIBOOT2_INFO_MEMMAP 6
 
 typedef struct { // bios thing, dont care for now
@@ -347,7 +347,7 @@ typedef struct {
     uint32_t type; // 17
     uint32_t size; 
     uint32_t desc_size; // size of one entry
-    uint32_t desc_version; // 0
+    uint32_t desc_version; // 1
     uint8_t data[]; // array of entries #TODO: type for entries
 } __attribute__ ((__packed__)) multiboot2_info_efi_memmap_tag;
 #define MULTIBOOT2_INFO_EFI_MEMMAP 17
