@@ -21,7 +21,7 @@ uint16 msg[67];
 #define print(str) COUT->OutputString(COUT, str)
 #define puti(val)  print(inttostr(msg, val, 10))
 #define puth(val)  print(inttostr(msg, val, 16))
-#define endl()     print(L"\n\r")
+#define endl()     print(u"\n\r")
 
 void check_status(uint16* msg, EFI_STATUS status, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST)
 {

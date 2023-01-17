@@ -11,7 +11,7 @@
 
 void free(void* ptr, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
     EFI_STATUS status = BS->FreePool(ptr);
-    check_status(L"free failed: ", status, ImageHandle, ST);
+    check_status(u"free failed: ", status, ImageHandle, ST);
 }
 
 void memset(void* ptr, byte val, uintn size) {
@@ -36,7 +36,7 @@ void memcpy(void* dest, void* src, uintn size) {
 void* malloc(uintn size, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
     void* ptr;
     EFI_STATUS status = BS->AllocatePool(EfiLoaderData, size, &ptr);
-    check_status(L"malloc failed: ", status, ImageHandle, ST);
+    check_status(u"malloc failed: ", status, ImageHandle, ST);
     return ptr;
 }
 

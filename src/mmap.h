@@ -25,12 +25,12 @@ void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SY
 
     EFI_STATUS status = ST->BootServices->GetMemoryMap(&size, buffer, &key, &desc_size, &desc_version);
     if (status == EFI_BUFFER_TOO_SMALL) ; 
-    else check_status(L"failed to get memory map size, error: ", status, ImageHandle, ST);
+    else check_status(u"failed to get memory map size, error: ", status, ImageHandle, ST);
     
     buffer = (EFI_MEMORY_DESCRIPTOR*) malloc(size, ImageHandle, ST);
     
     status = ST->BootServices->GetMemoryMap(&size, buffer, &key, &desc_size, &desc_version);
-    check_status(L"failed to get memory map, error: ", status, ImageHandle, ST);
+    check_status(u"failed to get memory map, error: ", status, ImageHandle, ST);
 
     uintn num_entries = size / desc_size;
 
@@ -169,7 +169,7 @@ void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SY
                 break;
                 
                 default:
-                    print(L"unknown memory type: ");
+                    print(u"unknown memory type: ");
                     puti(curr->Type);
                     endl();
                     break;
@@ -179,11 +179,11 @@ void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SY
     memtag->mem_upper -= 1024*1024; // standard says to subtract 1MB
 
     // for (int i = 0; i < mmaptag->size / sizeof(multiboot2_mmap_entry); i++) {
-    //     print(L"memory type: ");
+    //     print(u"memory type: ");
     //     puti(mmaptag->entries[i].type);
-    //     print(L" addr: ");
+    //     print(u" addr: ");
     //     puti(mmaptag->entries[i].base_addr);
-    //     print(L" -> ");
+    //     print(u" -> ");
     //     puti(mmaptag->entries[i].base_addr + mmaptag->entries[i].length);
     //     endl();
     // }

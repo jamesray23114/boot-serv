@@ -64,16 +64,16 @@ void hd(void* ptr, uintn size, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
 
             endl();
 
-            uint16 str[9] = L"        ";
+            uint16 str[9] = u"        ";
             memcpy(str, inttostr((void*) msg, ((uintn) ptr + i), 16), wstrlen(inttostr((void*) msg,((uintn) ptr + i), 16)));
             print(str);
-            print(L": ");
+            print(u": ");
         }
 
-        uint16 str[6] = L"  \0\0\0"; // gcc complains if I don't add the null bytes, don't know why
+        uint16 str[6] = u"  \0\0\0"; // gcc complains if I don't add the null bytes, don't know why
         memcpy(str, inttostr((void*) msg, ((byte*)ptr)[i], 16), wstrlen(inttostr((void*) msg, ((byte*)ptr)[i], 16)));
         print(str);
-        print(L" ");
+        print(u" ");
     }
 
     for (int i = 0; i < 16; i++)

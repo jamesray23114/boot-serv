@@ -17,7 +17,7 @@ int main()
 {
     FILE* file = fopen("_build/test.txt", "w");
 
-    short* str = L"hello world!";
+    short* str = u"hello world!";
 
     writews(str, file);
 

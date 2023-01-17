@@ -24,7 +24,7 @@ void efi_main(EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
     // load disk driver via efi
 
     EFI_FILE_PROTOCOL* fs = find_root(ImageHandle, ST);
-    //EFI_FILE_HANDLE file = open_file(fs, L"\\EFI\\BOOT\\test.txt", ImageHandle, ST);
+    //EFI_FILE_HANDLE file = open_file(fs, u"\\EFI\\BOOT\\test.txt", ImageHandle, ST);
     //byte* data = read_file(file, ImageHandle, ST);
 
 
@@ -34,7 +34,7 @@ void efi_main(EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 
     get_mmap_info(mb2_info, ImageHandle, ST);
 
-    print(L"stalling... ");
+    print(u"stalling... ");
     while (true) ;
 }
 
