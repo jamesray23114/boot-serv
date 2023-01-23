@@ -13,6 +13,8 @@
 #include <efidef.h>
 #include <efiprot.h>
 
+#include <bootserv.h>
+
 #define COUT ST->ConOut
 #define BS   ST->BootServices
 
@@ -46,3 +48,10 @@ void check_status(uint16* msg, EFI_STATUS status, EFI_HANDLE* ImageHandle, EFI_S
     }
 }
 
+EFI_INPUT_KEY wait_for_key(EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST)
+{
+    EFI_INPUT_KEY key;
+    ST->ConIn->Reset(ST->ConIn, false);
+    BS->WaitForEvent(1, &ST->ConIn->WaitForKey, nullptr);
+    ST->ConIn->ReadKeyStroke(ST->ConIn, &key);
+}

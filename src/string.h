@@ -7,8 +7,11 @@
 
 #pragma once
 #include <typedef.h>
+#include <util.h>
+
 #include "common.h"
 #include "memory.h"
+
 
 // uint64 to wstring
 uint16* inttostr(uint16* str, uint64 val, uint base) { 
@@ -29,7 +32,7 @@ uint16* inttostr(uint16* str, uint64 val, uint base) {
     return str + i + 1;
 }
 
-uintn wstrlen(uint16* str) {
+uintn wstrlen(uint16* str) { // returns the length of a wstring in bytes, not characters. divide by 2 to get the number of characters
     uintn i = 0;
     while (str[i] != '\0') i++;
     return i * 2; // 2 bytes per char
@@ -89,4 +92,121 @@ void hd(void* ptr, uintn size, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
         print(temp);
     }
     endl();
+}
+
+void print_info_tag_ex(multiboot2_info_tag* tag, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
+
+    switch (tag->type)
+    {
+    case MULTIBOOT2_INFO_CMDLINE:
+        multiboot2_info_cmdline_tag* cmd = (multiboot2_info_cmdline_tag*) tag;
+        print(u"    cmdline: ");
+        for(int i = 0; i < strlen(cmd->cmdline); i++) {
+            uint16 temp[] = { 0, 0 };
+            temp[0] = cmd->cmdline[i];
+            print(temp);
+        }
+        endl();
+        break;
+    
+    case MULTIBOOT2_INFO_BOOTLOADER_NAME:
+        multiboot2_info_bootloader_name_tag* bln = (multiboot2_info_bootloader_name_tag*) tag;
+        print(u"    bootloader name: ");
+        for(int i = 0; i < strlen(bln->str); i++) {
+            uint16 temp[] = { 0, 0 };
+            temp[0] = (uint16) bln->str[i];
+            print(temp);
+        }
+        endl();
+        break;
+
+    case MULTIBOOT2_INFO_MEMORY:
+        multiboot2_info_memory_tag* mem = (multiboot2_info_memory_tag*) tag;
+        print(u"    start address: ");
+        puti(mem->mem_lower);
+        endl();
+        print(u"    end address:   ");
+        puti(mem->mem_upper / 1024 / 1024);
+        print(u" MB");
+        endl();
+        break;
+
+    case MULTIBOOT2_INFO_MEMMAP:
+        multiboot2_info_memmap_tag* mmap = (multiboot2_info_memmap_tag*) tag;
+        print(u"    memory map:");
+        endl();
+        for (int i = 0; i < mmap->size / sizeof(multiboot2_mmap_entry); i++) {
+            print(u"        memory type: ");
+            puti(mmap->entries[i].type);
+            print(u" addr: ");
+            puth(mmap->entries[i].base_addr);
+            print(&(u"         "[wstrlen(inttostr(msg, mmap->entries[i].base_addr, 16)) / 2]));
+            print(u" -> ");
+            puth(mmap->entries[i].base_addr + mmap->entries[i].length);
+            endl();
+        }
+        break;
+
+    case MULTIBOOT2_INFO_FRAMEBUFFER:
+        multiboot2_info_framebuffer_tag* fb = (multiboot2_info_framebuffer_tag*) tag;
+        print(u"    framebuffer:");
+        endl();
+        print(u"        addr: ");
+        puth(fb->addr);
+        endl();
+        print(u"        pitch: ");
+        puti(fb->pitch);
+        endl();
+        print(u"        width: ");
+        puti(fb->width);
+        endl();
+        print(u"        height: ");
+        puti(fb->height);
+        endl();
+        print(u"        bpp: ");
+        puti(fb->bpp);
+        endl();
+        break;
+
+    default:
+        break;
+    }
+}
+
+
+
+void print_info_tags(multiboot2_info_table* table, bool ex, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
+
+    uintn size = table->size - sizeof(multiboot2_info_table);
+
+    print(u"printing info tags:");
+    print(u"                          size: ");
+    puti(size);
+    endl();
+
+    while (size > 0) {
+        multiboot2_info_tag* tag = (multiboot2_info_tag*) table->tags;
+        print(u"tag type: ");
+        print(ittws(*tag));
+
+        print(&(u"                                  "[wstrlen(ittws(*tag)) / 2])); // this is a hacky way to align strings
+
+        print(u" size: ");
+        puti(tag->size);
+        endl();
+
+        if (ex)
+            print_info_tag_ex(tag, ImageHandle, ST);
+
+        size -= tag->size;
+        table = (void*) ((uintn) table + tag->size);
+
+
+        uintn ccol = ST->ConOut->Mode->CursorColumn;
+        print(u"press any key to continue...");
+        wait_for_key(ImageHandle, ST);
+        print(u"\r");
+    }
+
+    print(u"                             \r"); // remove the "press any key to continue..." message
 }
