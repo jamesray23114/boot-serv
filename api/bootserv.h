@@ -49,6 +49,7 @@ typedef struct {
     uint32_t tags[]; // info tags requested by the kernel, the value refering to the type of the tag
 } __attribute__ ((__packed__)) multiboot2_request_tag; // refer to MULTIBOOT2 INFO STRUCTURE below
 #define MULTIBOOT2_TAG_REQUEST 1
+#define MULTIBOOT2_TAG_REQUEST_STRING "MULTIBOOT2_TAG_REQUEST"
 
 typedef struct {
     uint16_t type; // 2
@@ -60,6 +61,7 @@ typedef struct {
     uint32_t bss_end_addr;  // end address of the bss segment
 } __attribute__ ((__packed__)) multiboot2_address_tag;
 #define MULTIBOOT2_TAG_ADDRESS 2
+#define MULTIBOOT2_TAG_ADDRESS_STRING "MULTIBOOT2_TAG_ADDRESS"
 
 typedef struct {
     uint16_t type; // 3
@@ -68,6 +70,7 @@ typedef struct {
     uint32_t entry_addr; // physical address of the entry point
 } __attribute__ ((__packed__)) multiboot2_entry_tag;
 #define MULTIBOOT2_TAG_ENTRY 3
+#define MULTIBOOT2_TAG_ENTRY_STRING "MULTIBOOT2_TAG_ENTRY"
 
 typedef struct {
     uint16_t type; // 4
@@ -78,6 +81,7 @@ typedef struct {
         // bit 1: os image supports ega text mode
 } __attribute__ ((__packed__)) multiboot2_console_tag;
 #define MULTIBOOT2_TAG_CONSOLE 4
+#define MULTIBOOT2_TAG_CONSOLE_STRING "MULTIBOOT2_TAG_CONSOLE"
 
 typedef struct {
     uint16_t type; // 5
@@ -88,6 +92,7 @@ typedef struct {
     uint32_t depth;     // number of bits per pixel, 0 if in text mode or os doesnt care
 } __attribute__ ((__packed__)) multiboot2_framebuffer_tag;
 #define MULTIBOOT2_TAG_FRAMEBUFFER 5
+#define MULTIBOOT2_TAG_FRAMEBUFFER_STRING "MULTIBOOT2_TAG_FRAMEBUFFER"
 
 typedef struct {
     uint16_t type; // 6
@@ -95,6 +100,7 @@ typedef struct {
     uint32_t size; // 8
 } __attribute__ ((__packed__)) multiboot2_module_alignment_tag; // if present modules must be page aligned
 #define MULTIBOOT2_TAG_MODULE_ALIGNMENT 6
+#define MULTIBOOT2_TAG_MODULE_ALIGNMENT_STRING "MULTIBOOT2_TAG_MODULE_ALIGNMENT"
 
 typedef struct {
     uint16_t type; // 7
@@ -102,6 +108,7 @@ typedef struct {
     uint32_t size; // 8
 } __attribute__ ((__packed__)) multiboot2_bootservices_tag; // if present the kernel can start before efi boot services are terminated
 #define MULTIBOOT2_TAG_BOOTSERVICES 7
+#define MULTIBOOT2_TAG_BOOTSERVICES_STRING "MULTIBOOT2_TAG_BOOTSERVICES"
 
 typedef struct {
     uint16_t type; // 8
@@ -110,6 +117,7 @@ typedef struct {
     uint32_t entry_addr; // physical address of the entry point, should only be done if the header contains a efi boot services tag
 } __attribute__ ((__packed__)) multiboot2_efi_entry_tag;
 #define MULTIBOOT2_TAG_EFI_ENTRY 8
+#define MULTIBOOT2_TAG_EFI_ENTRY_STRING "MULTIBOOT2_TAG_EFI_ENTRY"
 
 typedef struct {
     uint16_t type; // 9
@@ -118,6 +126,7 @@ typedef struct {
     uint32_t entry_addr; // physical address of the entry point, should only be done if the header contains a efi boot services tag
 } __attribute__ ((__packed__)) multiboot2_x86_64_efi_entry_tag;
 #define MULTIBOOT2_TAG_X86_64_EFI_ENTRY 9
+#define MULTIBOOT2_TAG_X86_64_EFI_ENTRY_STRING "MULTIBOOT2_TAG_X86_64_EFI_ENTRY"
 
 typedef struct {
     uint16_t type; // 10
@@ -129,6 +138,7 @@ typedef struct {
     uint32_t preference; // the preferred address of the kernel, 0 if no preference, 1 at the lowest address, 2 at the highest address. 
 } __attribute__ ((__packed__)) multiboot2_relocation_tag;
 #define MULTIBOOT2_TAG_RELOCATION 10
+#define MULTIBOOT2_TAG_RELOCATION_STRING "MULTIBOOT2_TAG_RELOCATION"
 
 // =================================================================================================
 // MULTIBOOT2 INFO STRUCTURE
@@ -153,6 +163,7 @@ typedef struct {
     char cmdline[]; // null terminated string 
 } __attribute__ ((__packed__)) multiboot2_info_cmdline_tag;
 #define MULTIBOOT2_INFO_CMDLINE 1
+#define MULTIBOOT2_INFO_CMDLINE_STRING "MULTIBOOT2_INFO_CMDLINE"
 
 typedef struct 
 {
@@ -161,6 +172,7 @@ typedef struct
     char str[]; // null terminated string
 } __attribute__ ((__packed__)) multiboot2_info_bootloader_name_tag; 
 #define MULTIBOOT2_INFO_BOOTLOADER_NAME 2
+#define MULTIBOOT2_INFO_BOOTLOADER_NAME_STRING "MULTIBOOT2_INFO_BOOTLOADER_NAME"
 
 typedef struct {
     uint32_t type; // 3
@@ -170,6 +182,7 @@ typedef struct {
     char str[];         // null terminated string
 } __attribute__ ((__packed__)) multiboot2_info_modules_tag;
 #define MULTIBOOT2_INFO_MODULES 3
+#define MULTIBOOT2_INFO_MODULES_STRING "MULTIBOOT2_INFO_MODULES"
 
 typedef struct {
     uint32_t type; // 4
@@ -178,6 +191,7 @@ typedef struct {
     uint32_t mem_upper; // in kilobytes, lowest value is 1024
 } __attribute__ ((__packed__)) multiboot2_info_memory_tag;
 #define MULTIBOOT2_INFO_MEMORY 4
+#define MULTIBOOT2_INFO_MEMORY_STRING "MULTIBOOT2_INFO_MEMORY"
 
 typedef struct {
     uint32_t type; // 5
@@ -187,6 +201,7 @@ typedef struct {
     uint32_t sub_partition; // bios partition number
 } __attribute__ ((__packed__)) multiboot2_info_bootdev_tag;
 #define MULTIBOOT2_INFO_BOOTDEV 5
+#define MULTIBOOT2_INFO_BOOTDEV_STRING "MULTIBOOT2_INFO_BOOTDEV"
 
 typedef struct {
     uint64_t base_addr;
@@ -203,6 +218,7 @@ typedef struct {
     multiboot2_mmap_entry entries[]; // array of memory regions
 } __attribute__ ((__packed__)) multiboot2_info_memmap_tag;
 #define MULTIBOOT2_INFO_MEMMAP 6
+#define MULTIBOOT2_INFO_MEMMAP_STRING "MULTIBOOT2_INFO_MEMMAP"
 
 typedef struct { // bios thing, dont care for now
     uint32_t type; // 7
@@ -215,6 +231,7 @@ typedef struct { // bios thing, dont care for now
     uint8_t  mode_info[256];
 } __attribute__ ((__packed__)) multiboot2_info_vbe_tag;
 #define MULTIBOOT2_INFO_VBE 7
+#define MULTIBOOT2_INFO_VBE_STRING "MULTIBOOT2_INFO_VBE"
 
 typedef struct {
     uint8_t red;
@@ -249,6 +266,7 @@ typedef struct {
     uint8_t color_info[]; // nothing for type 2, refer to above for others
 } __attribute__ ((__packed__)) multiboot2_info_framebuffer_tag;
 #define MULTIBOOT2_INFO_FRAMEBUFFER 8
+#define MULTIBOOT2_INFO_FRAMEBUFFER_STRING "MULTIBOOT2_INFO_FRAMEBUFFER"
 
 typedef struct {
     uint32_t type; // 9
@@ -260,6 +278,7 @@ typedef struct {
     uint8_t data[];      // array of entries #TODO: type for entries
 } __attribute__ ((__packed__)) multiboot2_info_elf_sections_tag;
 #define MULTIBOOT2_INFO_ELF_SECTIONS 9
+#define MULTIBOOT2_INFO_ELF_SECTIONS_STRING "MULTIBOOT2_INFO_ELF_SECTIONS"
 
 typedef struct { // bios thing, dont care for now
     uint32_t type; // 10
@@ -275,6 +294,7 @@ typedef struct { // bios thing, dont care for now
     uint16_t dseg_len;
 } __attribute__ ((__packed__)) multiboot2_info_apm_table_tag;
 #define MULTIBOOT2_INFO_APM_TABLE 10
+#define MULTIBOOT2_INFO_APM_TABLE_STRING "MULTIBOOT2_INFO_APM_TABLE"
 
 typedef struct {
     uint32_t type; // 11
@@ -282,6 +302,7 @@ typedef struct {
     uint32_t pointer; // physical address of the efi system table
 } __attribute__ ((__packed__)) multiboot2_info_efi_system_table_tag;
 #define MULTIBOOT2_INFO_EFI_SYSTEM_TABLE 11
+#define MULTIBOOT2_INFO_EFI_SYSTEM_TABLE_STRING "MULTIBOOT2_INFO_EFI_SYSTEM_TABLE"
 
 typedef struct {
     uint32_t type; // 12
@@ -289,6 +310,7 @@ typedef struct {
     uint64_t pointer; // physical address of the efi system table
 } __attribute__ ((__packed__)) multiboot2_info_efi64_system_table_tag;
 #define MULTIBOOT2_INFO_EFI64_SYSTEM_TABLE 12
+#define MULTIBOOT2_INFO_EFI64_SYSTEM_TABLE_STRING "MULTIBOOT2_INFO_EFI64_SYSTEM_TABLE"
 
 typedef struct { // bios thing, dont care for now
     uint32_t type; // 13
@@ -299,6 +321,7 @@ typedef struct { // bios thing, dont care for now
     uint8_t tables[];
 } __attribute__ ((__packed__)) multiboot2_info_smbios_tag;
 #define MULTIBOOT2_INFO_SMBIOS 13
+#define MULTIBOOT2_INFO_SMBIOS_STRING "MULTIBOOT2_INFO_SMBIOS"
 
 typedef struct {
     char signature[8];
@@ -315,6 +338,7 @@ typedef struct { // old acpi, dont care for now
     rsdp_v1_desc table; // refer to above
 } __attribute__ ((__packed__)) multiboot2_info_acpi1_tag;
 #define MULTIBOOT2_INFO_ACPI1 14
+#define MULTIBOOT2_INFO_ACPI1_STRING "MULTIBOOT2_INFO_ACPI1"
 
 typedef struct {
     char signature[8];
@@ -335,6 +359,7 @@ typedef struct {
     rsdp_v2_desc table; // refer to above
 } __attribute__ ((__packed__)) multiboot2_info_acpi2_tag;
 #define MULTIBOOT2_INFO_ACPI2 15
+#define MULTIBOOT2_INFO_ACPI2_STRING "MULTIBOOT2_INFO_ACPI2"
 
 typedef struct { // unused for now
     uint32_t type; // 16
@@ -342,21 +367,24 @@ typedef struct { // unused for now
     uint8_t netdata[];
 } __attribute__ ((__packed__)) multiboot2_info_network_tag;
 #define MULTIBOOT2_INFO_NETWORK 16
+#define MULTIBOOT2_INFO_NETWORK_STRING "MULTIBOOT2_INFO_NETWORK"
 
 typedef struct {
     uint32_t type; // 17
     uint32_t size; 
     uint32_t desc_size; // size of one entry
     uint32_t desc_version; // 1
-    EFI_MEMORY_DESCRIPTOR data[]; 
+    uint8_t data[]; // array of entries #TODO: type for entries
 } __attribute__ ((__packed__)) multiboot2_info_efi_memmap_tag;
 #define MULTIBOOT2_INFO_EFI_MEMMAP 17
+#define MULTIBOOT2_INFO_EFI_MEMMAP_STRING "MULTIBOOT2_INFO_EFI_MEMMAP"
 
 typedef struct {
     uint32_t type; // 18
     uint32_t size;
 } __attribute__ ((__packed__)) multiboot2_info_bootservices_active_tag;
 #define MULTIBOOT2_INFO_BOOTSERVICES_ACTIVE 18
+#define MULTIBOOT2_INFO_BOOTSERVICES_ACTIVE_STRING "MULTIBOOT2_INFO_BOOTSERVICES_ACTIVE"
 
 typedef struct {
     uint32_t type; // 19
@@ -364,6 +392,7 @@ typedef struct {
     uint32_t pointer; // physical address of the efi image handle
 } __attribute__ ((__packed__)) multiboot2_info_efi_image_tag;
 #define MULTIBOOT2_INFO_EFI_IMAGE 19
+#define MULTIBOOT2_INFO_EFI_IMAGE_STRING "MULTIBOOT2_INFO_EFI_IMAGE"
 
 typedef struct {
     uint32_t type; // 20
@@ -371,6 +400,7 @@ typedef struct {
     uint64_t pointer; // physical address of the efi image handle
 } __attribute__ ((__packed__)) multiboot2_info_efi64_image_tag;
 #define MULTIBOOT2_INFO_EFI64_IMAGE 20
+#define MULTIBOOT2_INFO_EFI64_IMAGE_STRING "MULTIBOOT2_INFO_EFI64_IMAGE"
 
 typedef struct {
     uint32_t type; // 21
@@ -378,5 +408,6 @@ typedef struct {
     uint32_t load_base_addr; // used if image has relocatable header 
 } __attribute__ ((__packed__)) multiboot2_info_image_base_tag;
 #define MULTIBOOT2_INFO_IMAGE_BASE 21
+#define MULTIBOOT2_INFO_IMAGE_BASE_STRING "MULTIBOOT2_INFO_IMAGE_BASE"
 
 #endif
