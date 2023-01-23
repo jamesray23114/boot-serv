@@ -14,6 +14,75 @@
 #include "disk.h"
 #include "string.h"
 
+uint32 _get_first_bit(uint32 val) {
+    int i = 0;
+    while(val < 32) {
+        if((val << i) & 1) return i;
+        val++;
+    }
+    return 0;
+}
+
+uint32 _get_last_bit(uint32 val) {
+    int i = 31;
+    while(val > 0) {
+        if((val >> i) & 1) return i;
+        val--;
+    }
+    return 0;
+}
+
+void get_gop_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
+    EFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
+    EFI_GUID gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+    EFI_STATUS status = ST->BootServices->LocateProtocol(&gop_guid, nullptr, (void**)&gop);
+    check_status(u"failed to locate gop protocol, error: ", status, ImageHandle, ST);
+
+    gop->SetMode(gop, 0); 
+
+    multiboot2_info_framebuffer_tag* gop_tag = (multiboot2_info_framebuffer_tag*) ((byte*) table + table->size);
+    table->size += sizeof(multiboot2_info_framebuffer_tag) + sizeof(framebuffer_type_1); // currently only support type 1 (rgb)
+    gop_tag->type = MULTIBOOT2_INFO_FRAMEBUFFER;
+    gop_tag->size = sizeof(multiboot2_info_framebuffer_tag) + sizeof(framebuffer_type_1);
+    gop_tag->width = gop->Mode->Info->HorizontalResolution;
+    gop_tag->height = gop->Mode->Info->VerticalResolution;
+    gop_tag->addr = (uint64) gop->Mode->FrameBufferBase;
+    gop_tag->bpp = 32;
+    gop_tag->pitch = gop->Mode->Info->PixelsPerScanLine * 4;
+    gop_tag->fb_type = 1; // rgb
+
+    if(gop->Mode->Info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
+        framebuffer_type_1* fbinfo = (framebuffer_type_1*) gop_tag->color_info;
+        fbinfo->blue_field_position = 0;
+        fbinfo->blue_mask_size = 8;
+        fbinfo->green_field_position = 8;
+        fbinfo->green_mask_size = 8;
+        fbinfo->red_field_position = 16;
+        fbinfo->red_mask_size = 8;
+    } else if(gop->Mode->Info->PixelFormat == PixelRedGreenBlueReserved8BitPerColor) 
+    {
+        framebuffer_type_1* fbinfo = (framebuffer_type_1*) gop_tag->color_info;
+        fbinfo->blue_field_position = 16;
+        fbinfo->blue_mask_size = 8;
+        fbinfo->green_field_position = 8;
+        fbinfo->green_mask_size = 8;
+        fbinfo->red_field_position = 0;
+        fbinfo->red_mask_size = 8;
+    } else if(gop->Mode->Info->PixelFormat == PixelBitMask)
+    {
+        framebuffer_type_1* fbinfo = (framebuffer_type_1*) gop_tag->color_info; // no idea if this works and cannot test it
+        fbinfo->blue_field_position =   _get_first_bit(gop->Mode->Info->PixelInformation.BlueMask);
+        fbinfo->blue_mask_size =        _get_last_bit(gop->Mode->Info->PixelInformation.BlueMask) - fbinfo->blue_field_position + 1;
+        fbinfo->green_field_position =  _get_first_bit(gop->Mode->Info->PixelInformation.GreenMask);
+        fbinfo->green_mask_size =       _get_last_bit(gop->Mode->Info->PixelInformation.GreenMask) - fbinfo->green_field_position + 1;
+        fbinfo->red_field_position =    _get_first_bit(gop->Mode->Info->PixelInformation.RedMask);
+        fbinfo->red_mask_size =         _get_last_bit(gop->Mode->Info->PixelInformation.RedMask) - fbinfo->red_field_position + 1;
+    }
+    else {
+        print(u"unsupported pixel format from graphics output protocol\n\r");
+        ST->BootServices->Exit(ImageHandle, EFI_UNSUPPORTED, 0, nullptr);
+    }
+}
 
 void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SYSTEM_TABLE* ST) {
     uintn size = 0;
@@ -183,17 +252,6 @@ void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SY
     memtag->mem_upper -= 1024*1024; // standard says to subtract 1MB
     table->size += mmaptag->size;
 
-
-    //for (int i = 0; i < mmaptag->size / sizeof(multiboot2_mmap_entry); i++) {
-    //    print(u"memory type: ");
-    //    puti(mmaptag->entries[i].type);
-    //    print(u" addr: ");
-    //    puti(mmaptag->entries[i].base_addr);
-    //    print(u" -> ");
-    //    puti(mmaptag->entries[i].base_addr + mmaptag->entries[i].length);
-    //    endl();
-    //}
-
     multiboot2_info_efi_memmap_tag *efimmaptag = (multiboot2_info_efi_memmap_tag *) ((byte*) table + table->size);
     efimmaptag->type = MULTIBOOT2_INFO_EFI_MEMMAP;
     efimmaptag->size = sizeof(multiboot2_info_efi_memmap_tag) + size;
@@ -203,6 +261,4 @@ void get_mmap_info(multiboot2_info_table* table, EFI_HANDLE* ImageHandle, EFI_SY
 
     memcpy(efimmaptag->data, buffer, size);
     table->size += efimmaptag->size;
-
-    hd(mmaptag, 16 * 128, ImageHandle, ST);
 }
